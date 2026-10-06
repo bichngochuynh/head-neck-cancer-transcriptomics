@@ -8,16 +8,13 @@
 *Analysis code for my Master's thesis.* This repository contains the R
 pipeline only. No data, results or figures are included.
 
-## Summary
+## Abstract
 
-Head and neck squamous cell carcinoma (HNSC) responds unevenly to
-immunotherapy, and HPV-positive and HPV-negative tumours behave as clinically
-distinct diseases. This pipeline classifies TCGA-HNSC tumours as
-**immune-hot** or **immune-cold** using three immune-deconvolution methods,
-then characterises the groups with differential expression, pathway
-enrichment and survival analysis. A single-cell RNA-seq pipeline on a public
-HNSC dataset then annotates cell types and compares the cellular composition
-and cell-type-specific expression of HPV+ and HPV− tumours.
+Head and neck squamous cell carcinoma (HNSCC) is a diverse cancer with large differences in its tumour immune microenvironment. HPV-positive tumours often have better clinical outcomes than HPV-negative tumours, but HPV status alone does not fully explain immune variation between patients. This study therefore focused first on immune phenotype, rather than HPV status alone. Using TCGA-HNSC bulk RNA-seq data, immune infiltration was estimated with MCP-counter, ESTIMATE and xCell. Tumours were classified into immune-hot and immune-cold groups. In total, 139 tumours were classified as immune-hot and 381 as immune-cold. Immune-hot tumours showed stronger immune-related signals, including T-cell, B-cell, plasma-cell and antigen-presentation programmes. Immune-cold tumours showed weaker immune activation and relatively stronger metabolic, ribosomal and structural gene-expression programmes.
+
+HPV-positive tumours were significantly enriched in the immune-hot group, but HPV status and immune phenotype were not identical. Many immune-hot tumours were HPV-negative, showing that immune phenotype provides information beyond HPV status. Survival analysis showed that HPV-positive status was associated with better overall survival, while immune-hot/cold status alone was not significantly associated with overall survival.
+
+Single-cell RNA-seq data from GSE181919 were then used to interpret the bulk findings at cell-type level. HPV-associated gene-expression differences were mainly linked to epithelial cells, while B/plasma cells showed the strongest immune-cell-associated signal. Overall, this study shows that HPV status and immune phenotype are related but distinct features of HNSCC biology. Classifying tumours by immune-hot and immune-cold states may help describe tumour immune heterogeneity and guide future studies, but further validation is needed before clinical use.
 
 ## Workflow
 
