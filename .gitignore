@@ -1,0 +1,58 @@
+# renv
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/
+renv.lock.bak
+
+# R session / RStudio
+.Rproj.user/
+.Rhistory
+**/.Rhistory
+.RData
+.RDataTmp*
+.Ruserdata
+Rplots.pdf
+
+# Generated outputs and results -- code only is shared in this repository
+outputs/
+results/
+*.png
+*.jpg
+*.pdf
+*.svg
+*.csv
+*.tsv
+*.xlsx
+*.html
+
+# Raw / intermediate data (downloaded by the scripts, never tracked)
+GDC_HNSC/
+GSE181919_*
+*.rds
+*.RData
+*.txt
+*.gz
+*.h5
+*.loom
+*.fastq
+*.fastq.gz
+*.fq.gz
+*.bam
+MANIFEST.txt
+
+# Superseded / exploratory scripts kept locally only.
+# Published code = bulk_seq_analysis/ + scRNA_analysis/01_run_scRNAseq_pipeline.R
+archive_old_pipeline/
+00_project_setup.R
+01_final_scRNAseq_pipeline.R
+Ngoc_analysis_immunehot_cold_local.R
+check_tissuetype_counts.R
+scRNA_analysis/*
+!scRNA_analysis/01_run_scRNAseq_pipeline.R
+
+# Local tool settings
+.claude/
