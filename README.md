@@ -22,19 +22,22 @@ and cell-type-specific expression of HPV+ and HPV− tumours.
 ## Workflow
 
 ```mermaid
-flowchart LR
-    subgraph BULK["Bulk RNA-seq · TCGA-HNSC"]
+flowchart TB
+    subgraph BULK["Stage 1 · Bulk RNA-seq · TCGA-HNSC"]
+        direction LR
         A[GDC STAR counts<br/>TCGAbiolinks] --> B[Immune deconvolution<br/>MCP-counter · xCell · ESTIMATE]
         B --> C[k-means k=2<br/>Immune-hot / cold]
         C --> D[DESeq2 + apeglm<br/>GSEA / ORA · clusterProfiler]
         C --> E[HPV association<br/>Kaplan–Meier · Cox PH]
     end
-    subgraph SC["scRNA-seq · GEO GSE181919"]
+    subgraph SC["Stage 2 · Single-cell RNA-seq · GEO GSE181919"]
+        direction LR
         F[UMI counts] --> G[Per-tissue MAD QC<br/>SCTransform]
         G --> H[PCA · Louvain · UMAP]
         H --> I[SingleR + marker panels<br/>cell-type annotation]
         I --> J[Composition by HPV<br/>pseudobulk DE · ORA / GSEA]
     end
+    BULK ==> SC
 ```
 
 ## Repository structure
@@ -42,7 +45,7 @@ flowchart LR
 ```
 .
 ├── data/                       # README with public accessions (no data committed)
-├── bulk_seq_analysis/          # bulk RNA-seq track, run in numeric order
+├── bulk_seq_analysis/          # Stage 1: bulk RNA-seq, run in numeric order
 │   ├── 01_download_HNSC_TCGAbiolinks.R          # GDC download (STAR counts)
 │   ├── 02_import_HNSC_clinical_2018.R           # clinical / HPV / survival import
 │   ├── 03_run_immune_deconvolution.R            # MCP-counter, xCell, ESTIMATE
@@ -52,7 +55,7 @@ flowchart LR
 │   ├── 07_visualise_de_immune_hot_vs_cold.R     # volcano, heatmaps
 │   ├── 08_correlate_genes_with_immunescore.R    # gene–ImmuneScore correlation
 │   └── 09_clinical_association_immune_hot_vs_cold.R  # Fisher, KM, Cox PH
-├── scRNA_analysis/             # single-cell track
+├── scRNA_analysis/             # Stage 2: single-cell RNA-seq
 │   └── 01_run_scRNAseq_pipeline.R   # QC → SCTransform → clustering → annotation →
 │                                    # HPV composition → pseudobulk DE → ORA / GSEA
 └── renv.lock                   # pinned package versions
@@ -60,17 +63,25 @@ flowchart LR
 
 ## Methods implemented
 
+### Stage 1: Bulk RNA-seq (TCGA-HNSC)
+
 | Step | Implementation | Rationale |
 |---|---|---|
-| scRNA QC | 3 × MAD on log10 counts / genes / mito%, computed **per tissue type** | Library complexity differs by tissue, so one global cutoff would over- or under-filter |
+| Immune deconvolution | MCP-counter, xCell and ESTIMATE (immunedeconv) | Three independent estimates of immune infiltration |
+| Immune groups | k-means on MCP-counter immune scores; ESTIMATE only names clusters; xCell held out | Keeps an independent method for validation |
+| Differential expression | DESeq2 Wald test with apeglm LFC shrinkage | Shrinkage stabilises fold changes for low-count genes |
+| Pathways | clusterProfiler ORA and GSEA (GO BP, KEGG) | GSEA catches coordinated sub-threshold shifts that ORA misses |
+| Survival | Kaplan–Meier, log-rank, uni- and multivariable Cox PH | Tests whether the immune phenotype is prognostic independently of HPV |
+
+### Stage 2: Single-cell RNA-seq
+
+| Step | Implementation | Rationale |
+|---|---|---|
+| QC | 3 × MAD on log10 counts / genes / mito%, computed **per tissue type** | Library complexity differs by tissue, so one global cutoff would over- or under-filter |
 | Normalisation | SCTransform v2 (glmGamPoi), regressing mito% | Removes sequencing-depth and mitochondrial technical variance |
 | Clustering | PCA → shared-nearest-neighbour graph → Louvain → UMAP | PCs chosen from the elbow plot; checkpoints saved after expensive steps |
 | Annotation | SingleR (celldex reference) + canonical marker panels | Combines reference-based labels with marker validation |
-| scRNA DE | Pseudobulk DESeq2 (counts summed per patient per cell type) | Avoids pseudo-replication from treating cells of one patient as independent |
-| Bulk immune groups | k-means on MCP-counter immune scores; ESTIMATE only names clusters; xCell held out | Keeps an independent method for validation |
-| Bulk DE | DESeq2 Wald test with apeglm LFC shrinkage | Shrinkage stabilises fold changes for low-count genes |
-| Pathways | clusterProfiler ORA and GSEA (GO BP, KEGG) | GSEA catches coordinated sub-threshold shifts that ORA misses |
-| Survival | Kaplan–Meier, log-rank, uni- and multivariable Cox PH | Tests whether the immune phenotype is prognostic independently of HPV |
+| Differential expression | Pseudobulk DESeq2 (counts summed per patient per cell type), then ORA / GSEA | Avoids pseudo-replication from treating cells of one patient as independent |
 
 ## Data
 
